@@ -1,0 +1,269 @@
+{
+  "generated_at": "2026-10-11T22:16:26",
+  "meta": {
+    "SSH log": "auth.log (66 auth events, 1 non-auth lines skipped)",
+    "Web log": "access.log (232 requests, 0 unparseable lines skipped)",
+    "Thresholds": "brute force >= 5 failures / 300s"
+  },
+  "summary": {
+    "total_alerts": 11,
+    "by_severity": {
+      "critical": 2,
+      "high": 6,
+      "medium": 3,
+      "low": 0,
+      "info": 0
+    },
+    "top_source_ips": [
+      [
+        "203.0.113.99",
+        2
+      ],
+      [
+        "192.0.2.99",
+        2
+      ],
+      [
+        "198.51.100.77",
+        2
+      ],
+      [
+        "192.0.2.45",
+        2
+      ],
+      [
+        "203.0.113.50",
+        1
+      ]
+    ]
+  },
+  "alerts": [
+    {
+      "rule": "web_sql_injection",
+      "severity": "critical",
+      "title": "SQL injection attempts from 203.0.113.99",
+      "source_ip": "203.0.113.99",
+      "first_seen": "2026-10-10T10:00:00",
+      "last_seen": "2026-10-10T10:00:28",
+      "count": 15,
+      "mitre_id": "T1190",
+      "mitre_name": "Exploit Public-Facing Application",
+      "recommendation": "Use parameterised queries, validate input, and review database logs for the targeted endpoint. The server returned HTTP 200 to at least one payload - verify manually whether it was exploited.",
+      "details": {
+        "sample_requests": [
+          "/products?id=1'%20OR%20'1'='1",
+          "/products?id=1%20UNION%20SELECT%20username,password%20FROM%20users--",
+          "/products?id=1;%20DROP%20TABLE%20users"
+        ],
+        "http_200_responses": 4,
+        "user_agent": "sqlmap/1.7.2#stable (https://sqlmap.org)"
+      },
+      "alert_id": "LG-0001"
+    },
+    {
+      "rule": "ssh_success_after_failures",
+      "severity": "critical",
+      "title": "Successful SSH login for 'carol' from 192.0.2.99 after 6 failures",
+      "source_ip": "192.0.2.99",
+      "first_seen": "2026-10-10T14:00:00",
+      "last_seen": "2026-10-10T14:00:50",
+      "count": 7,
+      "mitre_id": "T1078",
+      "mitre_name": "Valid Accounts",
+      "recommendation": "Treat the account as compromised: terminate the session, reset credentials and keys, review commands run and files changed after the login time, and check for persistence.",
+      "details": {
+        "account": "carol",
+        "auth_method": "password",
+        "failures_before_success": 6,
+        "login_time": "2026-10-10T14:00:50"
+      },
+      "alert_id": "LG-0002"
+    },
+    {
+      "rule": "ssh_brute_force",
+      "severity": "high",
+      "title": "SSH brute-force attempt from 203.0.113.50",
+      "source_ip": "203.0.113.50",
+      "first_seen": "2026-10-10T09:00:00",
+      "last_seen": "2026-10-10T09:01:57",
+      "count": 40,
+      "mitre_id": "T1110",
+      "mitre_name": "Brute Force",
+      "recommendation": "Block or rate-limit the source IP (fail2ban / firewall), disable password authentication in favour of keys, and confirm none of the targeted accounts were accessed.",
+      "details": {
+        "targeted_users": {
+          "admin": 17,
+          "ubuntu": 13,
+          "root": 10
+        },
+        "distinct_users": 3
+      },
+      "alert_id": "LG-0003"
+    },
+    {
+      "rule": "ssh_brute_force",
+      "severity": "high",
+      "title": "SSH brute-force attempt from 198.51.100.77",
+      "source_ip": "198.51.100.77",
+      "first_seen": "2026-10-10T12:00:00",
+      "last_seen": "2026-10-10T12:03:40",
+      "count": 12,
+      "mitre_id": "T1110",
+      "mitre_name": "Brute Force",
+      "recommendation": "Block or rate-limit the source IP (fail2ban / firewall), disable password authentication in favour of keys, and confirm none of the targeted accounts were accessed.",
+      "details": {
+        "targeted_users": {
+          "test": 1,
+          "oracle": 1,
+          "postgres": 1,
+          "git": 1,
+          "jenkins": 1
+        },
+        "distinct_users": 12
+      },
+      "alert_id": "LG-0004"
+    },
+    {
+      "rule": "ssh_password_spray",
+      "severity": "high",
+      "title": "Password spraying / user enumeration from 198.51.100.77",
+      "source_ip": "198.51.100.77",
+      "first_seen": "2026-10-10T12:00:00",
+      "last_seen": "2026-10-10T12:03:40",
+      "count": 12,
+      "mitre_id": "T1110.003",
+      "mitre_name": "Brute Force: Password Spraying",
+      "recommendation": "Block the source IP, review authentication logs for any successful login by the targeted usernames, and enforce MFA / account lockout policies.",
+      "details": {
+        "distinct_users": 12,
+        "sample_users": [
+          "backup",
+          "deploy",
+          "ftp",
+          "git",
+          "guest",
+          "jenkins",
+          "oracle",
+          "postgres"
+        ],
+        "invalid_user_attempts": 12
+      },
+      "alert_id": "LG-0005"
+    },
+    {
+      "rule": "web_xss",
+      "severity": "high",
+      "title": "Cross-site scripting (XSS) attempts from 192.0.2.45",
+      "source_ip": "192.0.2.45",
+      "first_seen": "2026-10-10T13:00:00",
+      "last_seen": "2026-10-10T13:00:00",
+      "count": 1,
+      "mitre_id": "T1190",
+      "mitre_name": "Exploit Public-Facing Application",
+      "recommendation": "Apply output encoding and a Content-Security-Policy; review the reflected parameter. The server returned HTTP 200 to at least one payload - verify manually whether it was exploited.",
+      "details": {
+        "sample_requests": [
+          "/search?q=%3Cscript%3Ealert(1)%3C/script%3E"
+        ],
+        "http_200_responses": 1,
+        "user_agent": "Mozilla/5.0 (X11; Linux x86_64) Firefox/118.0"
+      },
+      "alert_id": "LG-0006"
+    },
+    {
+      "rule": "web_path_traversal",
+      "severity": "high",
+      "title": "Path traversal / local file access attempts from 192.0.2.45",
+      "source_ip": "192.0.2.45",
+      "first_seen": "2026-10-10T13:00:05",
+      "last_seen": "2026-10-10T13:00:09",
+      "count": 2,
+      "mitre_id": "T1190",
+      "mitre_name": "Exploit Public-Facing Application",
+      "recommendation": "Canonicalise and whitelist file paths; run the web process with minimal filesystem rights.",
+      "details": {
+        "sample_requests": [
+          "/download?file=../../../../etc/passwd",
+          "/download?file=%252e%252e%252f%252e%252e%252fetc/passwd"
+        ],
+        "http_200_responses": 0,
+        "user_agent": "Mozilla/5.0 (X11; Linux x86_64) Firefox/118.0"
+      },
+      "alert_id": "LG-0007"
+    },
+    {
+      "rule": "ssh_brute_force",
+      "severity": "high",
+      "title": "SSH brute-force attempt from 192.0.2.99",
+      "source_ip": "192.0.2.99",
+      "first_seen": "2026-10-10T14:00:00",
+      "last_seen": "2026-10-10T14:00:35",
+      "count": 6,
+      "mitre_id": "T1110",
+      "mitre_name": "Brute Force",
+      "recommendation": "Block or rate-limit the source IP (fail2ban / firewall), disable password authentication in favour of keys, and confirm none of the targeted accounts were accessed.",
+      "details": {
+        "targeted_users": {
+          "carol": 6
+        },
+        "distinct_users": 1
+      },
+      "alert_id": "LG-0008"
+    },
+    {
+      "rule": "web_scanner_user_agent",
+      "severity": "medium",
+      "title": "Security scanner 'sqlmap' detected from 203.0.113.99",
+      "source_ip": "203.0.113.99",
+      "first_seen": "2026-10-10T10:00:00",
+      "last_seen": "2026-10-10T10:00:28",
+      "count": 15,
+      "mitre_id": "T1595.002",
+      "mitre_name": "Active Scanning: Vulnerability Scanning",
+      "recommendation": "Confirm the traffic is not an authorised assessment. If it is not, block the source and review other alerts from the same IP.",
+      "details": {
+        "user_agent": "sqlmap/1.7.2#stable (https://sqlmap.org)"
+      },
+      "alert_id": "LG-0009"
+    },
+    {
+      "rule": "web_content_scanning",
+      "severity": "medium",
+      "title": "Content discovery / directory brute-forcing from 198.51.100.23",
+      "source_ip": "198.51.100.23",
+      "first_seen": "2026-10-10T11:00:00",
+      "last_seen": "2026-10-10T11:00:25",
+      "count": 64,
+      "mitre_id": "T1595.003",
+      "mitre_name": "Active Scanning: Wordlist Scanning",
+      "recommendation": "Rate-limit or block the source IP at the WAF/reverse proxy and confirm no sensitive paths (backups, admin panels) are exposed.",
+      "details": {
+        "distinct_paths": 64,
+        "sample_paths": [
+          "/admin0.php",
+          "/backup1.php",
+          "/config2.php"
+        ]
+      },
+      "alert_id": "LG-0010"
+    },
+    {
+      "rule": "ssh_root_login",
+      "severity": "medium",
+      "title": "Direct root SSH login from 203.0.113.77",
+      "source_ip": "203.0.113.77",
+      "first_seen": "2026-10-10T16:30:00",
+      "last_seen": "2026-10-10T16:30:00",
+      "count": 1,
+      "mitre_id": "T1078.003",
+      "mitre_name": "Valid Accounts: Local Accounts",
+      "recommendation": "Confirm the login was expected. Disable direct root login (PermitRootLogin no) and use named accounts with sudo.",
+      "details": {
+        "auth_methods": [
+          "password"
+        ]
+      },
+      "alert_id": "LG-0011"
+    }
+  ]
+}
